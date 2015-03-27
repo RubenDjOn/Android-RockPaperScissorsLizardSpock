@@ -40,6 +40,7 @@ public class Player {
     public void cleanMovement(){
         this.lastMovement = "";
     }
+
     private String getRandomMovement(){
         int idx = new Random().nextInt(allMovements.length);
         return allMovements[idx];

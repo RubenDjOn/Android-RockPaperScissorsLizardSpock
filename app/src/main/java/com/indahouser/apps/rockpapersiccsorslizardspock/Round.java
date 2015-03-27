@@ -42,6 +42,7 @@ public class Round {
     public String getWinnerMessage(){
         String newline = System.getProperty("line.separator");
         String winnerMessage = getMovementsMessage();
+        //String winnerMessage = "";
 
         if (isDrawRound()){
             winnerMessage += "Draw";

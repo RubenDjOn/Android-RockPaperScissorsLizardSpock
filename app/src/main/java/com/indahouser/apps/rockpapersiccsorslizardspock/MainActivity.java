@@ -17,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import java.util.Arrays;
@@ -52,23 +53,23 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
         setContentView(R.layout.activity_main);
         view = findViewById(R.id.textView);
-        //view.setBackgroundColor(Color.GREEN);
         lastUpdate = System.currentTimeMillis();
 
     }
-
+    /*
+    * http://www.vogella.com/tutorials/AndroidSensor/article.html
+    * */
     public void selectMovement(View view){
-        Button button = (Button) view;
+        ImageButton button = (ImageButton) view;
         String buttonSelected = (String) button.getTag();
-        game.selectButton((Button) button);
+        game.selectButton((ImageButton) button);
         user.setMovement(buttonSelected);
-        game.showToast(this, "Shake the phone to play");
-        //Toast.makeText(this, "Shake the phone to play", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Shake the phone to play", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER && game.canStatToPlay()) {
             getAccelerometer(event);
         }
     }
@@ -83,9 +84,16 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         float accelationSquareRoot = (x * x + y * y + z * z)
                 / (SensorManager.GRAVITY_EARTH * SensorManager.GRAVITY_EARTH);
         long actualTime = event.timestamp;
-        if (accelationSquareRoot >= 2) {
+        if (accelationSquareRoot >= 2 || accelationSquareRoot <=0.5) {
+            if (actualTime - lastUpdate < 600) {
+                return;
+            }
+            Log.d("acceleration", String.valueOf(accelationSquareRoot));
             lastUpdate = actualTime;
             round.processWinner();
+            int resID = getResources().getIdentifier("button_"+computer.getLastMovement().toLowerCase(), "id", "com.sample.project");
+            ImageButton buttonComputer= ((ImageButton) findViewById(resID));
+
             Log.d("Winner: ", round.getWinnerMessage());
             Toast.makeText(this, round.getWinnerMessage(), Toast.LENGTH_LONG)
                     .show();
